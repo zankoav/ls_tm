@@ -18,6 +18,17 @@ define( 'LS_TM_DIR', plugin_dir_path( __FILE__ ) );
 require_once LS_TM_DIR . 'includes/class-ls-tm-plugin.php';
 require_once LS_TM_DIR . 'includes/class-ls-tm-rest-controller.php';
 
+/**
+ * WordPress normally requires HTTPS before it exposes Application Passwords.
+ * The local LS_TM site runs only on localhost, where a separately revocable
+ * Application Password is needed for the scheduled REST API automation.
+ */
+add_filter( 'wp_is_application_passwords_available', function( $available ) {
+	$host = wp_parse_url( home_url(), PHP_URL_HOST );
+
+	return $available || in_array( $host, array( 'localhost', '127.0.0.1' ), true );
+} );
+
 function ls_tm() {
 	return LS_TM_Plugin::instance();
 }
